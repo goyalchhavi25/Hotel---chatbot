@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Management</title>
+<link rel="stylesheet" href="STYLE.CSS">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div id="menu">
+    <ul>
+        <li class="logo">
+            <a href="#"><img src="OIP (1).png"></a>
+        </li>
+      
+        <li class="nav-item"><a href="#">Home</a></li>
+        <li class="nav-item"><a href="#">Hotels</a></li>
+        <li class="nav-item"><a href="#">About</a></li>
+        <li class="nav-item"><a href="#">Login</a></li>
+    </ul>
+</div>
+
+<!-- DASHBOARD - Hotel Management Title Middle -->
+<main class="dashboard">
+    <div class="dashboard-content">
+        <h1>Hotel Management</h1>
+        <p>Welcome to our comprehensive hotel management system.</p>
+    </div>
+</main>
+
+<!-- Floating Chat Box Bottom Right -->
+<div id="chat-toggle">💬</div>
+<div id="chat-box">
+  <div class="chat-header">
+    <span>Hotel Assistant</span>
+    <span class="chat-close">&times;</span>
+  </div>
+  <div id="chat-messages"></div>
+  <div class="chat-input-area">
+    <input type="text" id="chat-input" placeholder="Type your message...">
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+let messages = [];
+
+function toggleChat() {
+  const box = document.getElementById('chat-box');
+  box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+  if (box.style.display === 'flex' && messages.length === 0) {
+    addMessage('bot', 'Hello! How may I assist you with hotel management today?');
+  }
+}
+
+function addMessage(sender, text) {
+  messages.push({sender, text});
+  const messagesDiv = document.getElementById('chat-messages');
+  messagesDiv.innerHTML = messages.map(msg => 
+    `<div class="chat-message ${msg.sender === "user" ? "user-msg" : "bot-msg"}">
+      <span>${sender === "user" ? "You" : "Assistant"}: ${text}</span>
+    </div>`
+  ).join('');
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  addMessage("user", msg);
+  input.value = '';
+  fetch('http://localhost:5000/chat', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({message: msg})
+  })
+  .then(res => res.json())
+  .then(data => addMessage('bot', data.reply))
+  .catch(err => addMessage('bot', 'Server unavailable. Please start with: python chatpython_flask.py'));
+}
+
+document.getElementById('chat-toggle').onclick = toggleChat;
+document.querySelector('.chat-close').onclick = toggleChat;
+document.getElementById('chat-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') sendChat();
+});
+</script>
+</body>
+</html>
