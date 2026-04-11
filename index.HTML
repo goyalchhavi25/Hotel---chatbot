@@ -47,26 +47,30 @@
 
 <script>
 let messages = [];
+let chatStarted = false;
 
 function toggleChat() {
   const box = document.getElementById('chat-box');
   box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
-  if (box.style.display === 'flex' && messages.length === 0) {
-    addMessage('bot', 'Hello! How may I assist you with hotel management today?');
+
+  if (box.style.display === 'flex' && !chatStarted) {
+    addMessage('bot', 'Hello! How may I assist you with hotel management today? 😊');
+    chatStarted = true;
   }
 }
 
 function addMessage(sender, text) {
-  messages.push({sender, text});
   const messagesDiv = document.getElementById('chat-messages');
-  messagesDiv.innerHTML = messages.map(msg => 
-    `<div class="chat-message ${msg.sender === "user" ? "user-msg" : "bot-msg"}">
-      <span>${sender === "user" ? "You" : "Assistant"}: ${text}</span>
-    </div>`
-  ).join('');
+
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `chat-message ${sender === "user" ? "user-msg" : "bot-msg"}`;
+
+  msgDiv.innerHTML = `<span>${sender === "user" ? "You" : "Assistant"}: ${text}</span>`;
+
+  messagesDiv.appendChild(msgDiv);
+
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
-
 function sendChat() {
   const input = document.getElementById('chat-input');
   const msg = input.value.trim();
